@@ -28,13 +28,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex align="center">
-        <Heading>Gareddit</Heading>
-        <NextLink href="/create-post">
-          <Link ml="auto">create post</Link>
-        </NextLink>
-      </Flex>
-      <br />
       {!data ? (
         fetching ? (
           <div>Loading...</div>
@@ -42,12 +35,16 @@ const Index = () => {
           <div>No posts to show</div>
         )
       ) : (
-        <Stack spacing={0}>
+        <Stack mt={2} spacing={0}>
           {posts.map((post) => (
-            <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
+            <Flex key={post.id} p={5} my={4} shadow="md" borderWidth="1px">
               <UpdootSection post={post}></UpdootSection>
               <Box>
-                <Heading fontSize="xl">{post.title}</Heading>
+                <NextLink href={`/post/[id]`} as={`/post/${post.id}`}>
+                  <Link>
+                    <Heading fontSize="xl">{post.title}</Heading>
+                  </Link>
+                </NextLink>
                 <Text fontSize=".8rem" color="#444">
                   posted by {post.creator.username}
                 </Text>

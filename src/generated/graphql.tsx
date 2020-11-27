@@ -32,7 +32,7 @@ export type QueryPostsArgs = {
 
 
 export type QueryPostArgs = {
-  id: Scalars['Float'];
+  id: Scalars['Int'];
 };
 
 
@@ -48,11 +48,12 @@ export type PaginatedPosts = {
 
 export type Post = {
   __typename?: 'Post';
-  id: Scalars['Float'];
+  id: Scalars['Int'];
   title: Scalars['String'];
   creatorId: Scalars['Float'];
   text: Scalars['String'];
   points: Scalars['Float'];
+  voteStatus?: Maybe<Scalars['Int']>;
   creator: User;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
@@ -157,7 +158,7 @@ export type UserInfoInput = {
 
 export type PostSnippetFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, 'textSnippet' | 'title' | 'createdAt' | 'updatedAt' | 'id' | 'points'>
+  & Pick<Post, 'textSnippet' | 'title' | 'createdAt' | 'updatedAt' | 'id' | 'points' | 'voteStatus'>
   & { creator: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'username'>
@@ -279,6 +280,23 @@ export type MeQuery = (
   )> }
 );
 
+export type PostQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type PostQuery = (
+  { __typename?: 'Query' }
+  & { post?: Maybe<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'text' | 'title' | 'createdAt' | 'updatedAt' | 'id' | 'points' | 'voteStatus'>
+    & { creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    ) }
+  )> }
+);
+
 export type PostsQueryVariables = Exact<{
   limit?: Maybe<Scalars['Int']>;
   cursor?: Maybe<Scalars['String']>;
@@ -305,6 +323,7 @@ export const PostSnippetFragmentDoc = gql`
   updatedAt
   id
   points
+  voteStatus
   creator {
     id
     username
@@ -422,6 +441,27 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const PostDocument = gql`
+    query Post($id: Int!) {
+  post(id: $id) {
+    text
+    title
+    createdAt
+    updatedAt
+    id
+    points
+    voteStatus
+    creator {
+      id
+      username
+    }
+  }
+}
+    `;
+
+export function usePostQuery(options: Omit<Urql.UseQueryArgs<PostQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PostQuery>({ query: PostDocument, ...options });
 };
 export const PostsDocument = gql`
     query Posts($limit: Int, $cursor: String) {
