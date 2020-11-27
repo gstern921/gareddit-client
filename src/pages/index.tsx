@@ -15,6 +15,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { UpdootSection } from "../components/UpdootSection";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -44,22 +45,7 @@ const Index = () => {
         <Stack spacing={0}>
           {posts.map((post) => (
             <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
-              <Flex
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-                mr={4}
-              >
-                <IconButton
-                  aria-label="Upvote this post"
-                  icon={<ChevronUpIcon fontSize="28px" />}
-                ></IconButton>
-                {post.points}
-                <IconButton
-                  aria-label="Downvote this post"
-                  icon={<ChevronDownIcon fontSize="28px" />}
-                ></IconButton>
-              </Flex>
+              <UpdootSection post={post}></UpdootSection>
               <Box>
                 <Heading fontSize="xl">{post.title}</Heading>
                 <Text fontSize=".8rem" color="#444">
