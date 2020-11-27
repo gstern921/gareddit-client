@@ -1,26 +1,35 @@
-import { Box, Flex, Link, Button } from "@chakra-ui/react";
+import { Box, Button, Textarea } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import InputField from "../components/InputField";
-import Wrapper from "../components/Wrapper";
-import toErrorMap from "../utils/toErrorMap";
-import login from "./login";
+import { useCreatePostMutation, useMeQuery } from "../generated/graphql";
+import { withUrqlClient } from "next-urql";
+import createUrqlClient from "../utils/createUrqlClient";
+import Layout from "../components/Layout";
+import { useIsAuth } from "../utils/useIsAuth";
+import { useState } from "react";
 
 const CreatePost: React.FC<{}> = ({}) => {
   const router = useRouter();
-  const [{}, login] = useCreatePostMutation();
+  useIsAuth();
+  const [, createPost] = useCreatePostMutation();
+  const [textAreaValue, setTextAreaValue] = useState("");
 
   return (
-    <Wrapper variant="small">
+    <Layout variant="small">
       <Formik
-        initialValues={{ usernameOrEmail: "", password: "" }}
+        initialValues={{ title: "", abc: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const res = await login(values);
-          const user = res.data?.login.user;
-          if (res.data?.login.errors) {
-            setErrors(toErrorMap(res.data.login.errors));
-          } else if (user) {
+          // console.log(values);
+          const { error } = await createPost({
+            input: {
+              title: values.title,
+              text: textAreaValue,
+            },
+          });
+          if (error) {
+          } else {
             router.push("/");
           }
         }}
@@ -29,23 +38,19 @@ const CreatePost: React.FC<{}> = ({}) => {
           <Form>
             <InputField
               type="text"
-              name="usernameOrEmail"
-              placeholder="username or email"
-              label="Username or Email"
+              name="title"
+              placeholder="title"
+              label="Title"
             ></InputField>
             <Box mt={4}>
-              <InputField
-                type="password"
-                name="password"
-                placeholder="password"
-                label="Password"
-              ></InputField>
+              <Textarea
+                onChange={(e) => {
+                  setTextAreaValue(e.target.value);
+                }}
+                name="abc"
+                placeholder="text..."
+              ></Textarea>
             </Box>
-            <Flex>
-              <NextLink href="/forgot-password">
-                <Link ml="auto">Forgot password?</Link>
-              </NextLink>
-            </Flex>
             <Box mt={4}>
               <Button
                 mt={-4}
@@ -53,14 +58,14 @@ const CreatePost: React.FC<{}> = ({}) => {
                 colorScheme="teal"
                 isLoading={isSubmitting}
               >
-                Log in
+                Create Post
               </Button>
             </Box>
           </Form>
         )}
       </Formik>
-    </Wrapper>
+    </Layout>
   );
 };
 
-export default CreatePost;
+export default withUrqlClient(createUrqlClient)(CreatePost);

@@ -41,10 +41,8 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
     // user is logged in
   }
   return (
-    <Flex bg="tan">
-      <Box p={4} ml="auto">
-        {body}
-      </Box>
+    <Flex zIndex={1} position="sticky" top={0} bg="tan" p={4}>
+      <Box ml="auto">{body}</Box>
     </Flex>
   );
 };

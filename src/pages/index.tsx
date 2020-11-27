@@ -1,20 +1,74 @@
-import NavBar from "../components/NavBar";
-
 import { withUrqlClient } from "next-urql";
 import createUrqlClient from "../utils/createUrqlClient";
 import { usePostsQuery } from "../generated/graphql";
+import Layout from "../components/Layout";
+import NextLink from "next/link";
+import {
+  Link,
+  Stack,
+  Box,
+  Heading,
+  Text,
+  Flex,
+  Button,
+} from "@chakra-ui/react";
+import { useState } from "react";
 
 const Index = () => {
-  const [{ data }] = usePostsQuery();
+  const [variables, setVariables] = useState({
+    limit: 15,
+    cursor: null as null | string,
+  });
+  const [{ data, fetching }] = usePostsQuery({ variables });
+
+  const posts = data ? data.posts.posts : [];
+
   return (
-    <>
-      <NavBar></NavBar>
-      <div>Hello world</div>
+    <Layout>
+      <Flex align="center">
+        <Heading>Gareddit</Heading>
+        <NextLink href="/create-post">
+          <Link ml="auto">create post</Link>
+        </NextLink>
+      </Flex>
       <br />
-      {!data
-        ? null
-        : data.posts.map((post) => <div key={post.id}>{post.title}</div>)}
-    </>
+      {!data ? (
+        fetching ? (
+          <div>Loading...</div>
+        ) : (
+          <div>No posts to show</div>
+        )
+      ) : (
+        <Stack spacing={0}>
+          {posts.map((post) => (
+            <Box key={post.id} p={5} shadow="md" borderWidth="1px">
+              <Heading fontSize="xl">{post.title}</Heading>{" "}
+              <Text fontSize=".8rem" color="#444">
+                posted by {post.creator.username}
+              </Text>
+              <Text mt={4}>{post.textSnippet}</Text>
+            </Box>
+          ))}
+        </Stack>
+      )}
+      {data && data.posts.hasMore ? (
+        <Flex>
+          <Button
+            onClick={() => {
+              setVariables({
+                limit: variables.limit,
+                cursor: posts[posts.length - 1].createdAt,
+              });
+            }}
+            isLoading={fetching}
+            m="auto"
+            my={8}
+          >
+            Load more
+          </Button>
+        </Flex>
+      ) : null}
+    </Layout>
   );
 };
 
