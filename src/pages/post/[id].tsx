@@ -1,21 +1,18 @@
 import { Box, Heading } from "@chakra-ui/react";
-import { withUrqlClient } from "next-urql";
 import React from "react";
 import EditPostButton from "../../components/EditPostButton";
 import Layout from "../../components/Layout";
 import { useMeQuery } from "../../generated/graphql";
-import createUrqlClient from "../../utils/createUrqlClient";
 import { getIntIdFromUrl } from "../../utils/useGetIntIdFromUrl";
 import { getPostFromUrlById } from "../../utils/useGetPostFromUrlById";
-import { isPostEditableByUser } from "../../utils/IsPostEditableByUser";
 import DeletePostButton from "../../components/DeletePostButton";
 
 const Post = () => {
   const intId = getIntIdFromUrl();
-  const [{ data, fetching }] = getPostFromUrlById(intId);
-  const [{ data: meData, fetching: fetchingMeData }] = useMeQuery();
+  const { data, loading } = getPostFromUrlById(intId);
+  const { data: meData, loading: fetchingMeData } = useMeQuery();
 
-  if (fetching || fetchingMeData) {
+  if (loading || fetchingMeData) {
     return <Layout>Loading...</Layout>;
   }
 
@@ -48,4 +45,4 @@ const Post = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post);
+export default Post;

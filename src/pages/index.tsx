@@ -1,13 +1,6 @@
-import { withUrqlClient } from "next-urql";
-import createUrqlClient from "../utils/createUrqlClient";
-import {
-  usePostsQuery,
-  useDeletePostMutation,
-  useMeQuery,
-} from "../generated/graphql";
+import { usePostsQuery, useMeQuery } from "../generated/graphql";
 import Layout from "../components/Layout";
 import NextLink from "next/link";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Link,
   Stack,
@@ -16,7 +9,6 @@ import {
   Text,
   Flex,
   Button,
-  IconButton,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { UpdootSection } from "../components/UpdootSection";
@@ -28,15 +20,15 @@ const Index = () => {
     limit: 15,
     cursor: null as null | string,
   });
-  const [{ data, fetching }] = usePostsQuery({ variables });
-  const [{ data: meData }] = useMeQuery();
+  const { data, loading } = usePostsQuery({ variables });
+  const { data: meData } = useMeQuery();
 
   const posts = data ? data.posts.posts : [];
 
   return (
     <Layout>
       {!data ? (
-        fetching ? (
+        loading ? (
           <div>Loading...</div>
         ) : (
           <div>No posts to show</div>
@@ -45,7 +37,7 @@ const Index = () => {
         <Stack mt={2} spacing={0}>
           {posts.map((post) => {
             const showButtons =
-              meData?.me.id && meData.me.id === post.creator.id;
+              meData && meData.me && meData.me.id === post.creator.id;
             return !post ? null : (
               <Flex
                 key={post.id}
@@ -105,7 +97,7 @@ const Index = () => {
                 cursor: posts[posts.length - 1].createdAt,
               });
             }}
-            isLoading={fetching}
+            isLoading={loading}
             m="auto"
             my={8}
           >
@@ -117,4 +109,4 @@ const Index = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default Index;

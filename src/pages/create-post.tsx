@@ -3,9 +3,7 @@ import { Formik, Form } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import InputField from "../components/InputField";
-import { useCreatePostMutation, useMeQuery } from "../generated/graphql";
-import { withUrqlClient } from "next-urql";
-import createUrqlClient from "../utils/createUrqlClient";
+import { useCreatePostMutation } from "../generated/graphql";
 import Layout from "../components/Layout";
 import { useIsAuth } from "../utils/useIsAuth";
 import { useState } from "react";
@@ -13,7 +11,7 @@ import { useState } from "react";
 const CreatePost: React.FC<{}> = ({}) => {
   const router = useRouter();
   useIsAuth();
-  const [, createPost] = useCreatePostMutation();
+  const [createPost] = useCreatePostMutation();
   const [textAreaValue, setTextAreaValue] = useState("");
 
   return (
@@ -22,13 +20,15 @@ const CreatePost: React.FC<{}> = ({}) => {
         initialValues={{ title: "", abc: "" }}
         onSubmit={async (values, { setErrors }) => {
           // console.log(values);
-          const { error } = await createPost({
-            input: {
-              title: values.title,
-              text: textAreaValue,
+          const { errors } = await createPost({
+            variables: {
+              input: {
+                title: values.title,
+                text: textAreaValue,
+              },
             },
           });
-          if (error) {
+          if (errors) {
           } else {
             router.push("/");
           }
@@ -68,4 +68,4 @@ const CreatePost: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(CreatePost);
+export default CreatePost;

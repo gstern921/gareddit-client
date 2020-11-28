@@ -14,11 +14,11 @@ const DeletePostButton: React.FC<DeleteButtonProps> = ({
   fontSize,
   show,
 }) => {
-  const [, deletePost] = useDeletePostMutation();
+  const [deletePost] = useDeletePostMutation();
   return show ? (
     <IconButton
       onClick={async () => {
-        await deletePost({ id });
+        await deletePost({ variables: { id } });
       }}
       variant=""
       fontSize={fontSize || "20px"}

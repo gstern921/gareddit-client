@@ -3,8 +3,6 @@ import { Formik, Form } from "formik";
 import React from "react";
 import InputField from "../../../components/InputField";
 import { useUpdatePostMutation } from "../../../generated/graphql";
-import { withUrqlClient } from "next-urql";
-import createUrqlClient from "../../../utils/createUrqlClient";
 import Layout from "../../../components/Layout";
 import { useIsAuth } from "../../../utils/useIsAuth";
 import { getPostFromUrlById } from "../../../utils/useGetPostFromUrlById";
@@ -13,14 +11,14 @@ import { useRouter } from "next/router";
 
 const EditPost: React.FC<{}> = ({}) => {
   const intId = getIntIdFromUrl();
-  const [{ data, fetching }] = getPostFromUrlById(intId);
+  const { data, loading } = getPostFromUrlById(intId);
   const router = useRouter();
 
   useIsAuth();
-  const [, updatePost] = useUpdatePostMutation();
-  if (fetching) {
+  const [updatePost] = useUpdatePostMutation();
+  if (loading) {
     return <div>Loading...</div>;
-  } else if (!fetching && !data?.post) {
+  } else if (!loading && !data?.post) {
     return <div>could not find post</div>;
   }
   return (
@@ -33,9 +31,11 @@ const EditPost: React.FC<{}> = ({}) => {
         onSubmit={async (values, { setErrors }) => {
           // console.log(data?.post?.text);
           const { error } = await updatePost({
-            id: intId,
-            title: values.title,
-            text: data?.post?.text || "",
+            variables: {
+              id: intId,
+              title: values.title,
+              text: data?.post?.text || "",
+            },
           });
 
           if (error) {
@@ -83,4 +83,4 @@ const EditPost: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(EditPost);
+export default EditPost;
