@@ -5,9 +5,14 @@ import React, { useState } from "react";
 import InputField from "../../components/InputField";
 import Wrapper from "../../components/Wrapper";
 import toErrorMap from "../../utils/toErrorMap";
-import { useChangePasswordMutation } from "../../generated/graphql";
+import {
+  useChangePasswordMutation,
+  MeQuery,
+  MeDocument,
+} from "../../generated/graphql";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
+import { withApollo } from "../../utils/withApollo";
 
 const ChangePassword: NextPage = () => {
   const [changePassword] = useChangePasswordMutation();
@@ -25,6 +30,15 @@ const ChangePassword: NextPage = () => {
             variables: {
               token,
               newPassword: values.newPassword,
+            },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: "Query",
+                  me: data?.changePassword?.user,
+                },
+              });
             },
           });
           const user = res.data?.changePassword?.user;
@@ -70,4 +84,4 @@ const ChangePassword: NextPage = () => {
   );
 };
 
-export default ChangePassword;
+export default withApollo({ ssr: false })(ChangePassword);

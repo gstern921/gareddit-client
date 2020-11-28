@@ -18,7 +18,12 @@ const DeletePostButton: React.FC<DeleteButtonProps> = ({
   return show ? (
     <IconButton
       onClick={async () => {
-        await deletePost({ variables: { id } });
+        await deletePost({
+          variables: { id },
+          update: (cache) => {
+            cache.evict({ id: "Post:" + id });
+          },
+        });
       }}
       variant=""
       fontSize={fontSize || "20px"}

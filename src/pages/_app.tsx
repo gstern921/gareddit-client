@@ -1,23 +1,14 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { ChakraProvider } from "@chakra-ui/react";
 
 import theme from "../theme";
-import { GRAPHQL_URL } from "../config/config";
-
-const client = new ApolloClient({
-  uri: GRAPHQL_URL,
-  cache: new InMemoryCache(),
-  credentials: "include" as const,
-});
+import { withApollo } from "../utils/withApollo";
 
 function MyApp({ Component, pageProps }: any) {
   return (
-    <ApolloProvider client={client}>
-      <ChakraProvider resetCSS theme={theme}>
-        <Component {...pageProps} />
-      </ChakraProvider>
-    </ApolloProvider>
+    <ChakraProvider resetCSS theme={theme}>
+      <Component {...pageProps} />
+    </ChakraProvider>
   );
 }
 
-export default MyApp;
+export default withApollo({ ssr: true })(MyApp);

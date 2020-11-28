@@ -7,6 +7,7 @@ import { useCreatePostMutation } from "../generated/graphql";
 import Layout from "../components/Layout";
 import { useIsAuth } from "../utils/useIsAuth";
 import { useState } from "react";
+import { withApollo } from "../utils/withApollo";
 
 const CreatePost: React.FC<{}> = ({}) => {
   const router = useRouter();
@@ -26,6 +27,9 @@ const CreatePost: React.FC<{}> = ({}) => {
                 title: values.title,
                 text: textAreaValue,
               },
+            },
+            update: (cache) => {
+              cache.evict({ fieldName: "posts:{}" });
             },
           });
           if (errors) {
@@ -68,4 +72,4 @@ const CreatePost: React.FC<{}> = ({}) => {
   );
 };
 
-export default CreatePost;
+export default withApollo({ ssr: false })(CreatePost);

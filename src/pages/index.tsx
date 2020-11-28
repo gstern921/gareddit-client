@@ -1,4 +1,4 @@
-import { usePostsQuery, useMeQuery } from "../generated/graphql";
+import { usePostsQuery, useMeQuery, PostsQuery } from "../generated/graphql";
 import Layout from "../components/Layout";
 import NextLink from "next/link";
 import {
@@ -16,11 +16,13 @@ import EditPostButton from "../components/EditPostButton";
 import DeletePostButton from "../components/DeletePostButton";
 
 const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: 15,
-    cursor: null as null | string,
+  const { data, loading, fetchMore, variables } = usePostsQuery({
+    variables: {
+      limit: 15,
+      cursor: null,
+    },
+    notifyOnNetworkStatusChange: true,
   });
-  const { data, loading } = usePostsQuery({ variables });
   const { data: meData } = useMeQuery();
 
   const posts = data ? data.posts.posts : [];
@@ -37,7 +39,11 @@ const Index = () => {
         <Stack mt={2} spacing={0}>
           {posts.map((post) => {
             const showButtons =
-              meData && meData.me && meData.me.id === post.creator.id;
+              post.creator &&
+              post.creator.id &&
+              meData &&
+              meData.me &&
+              meData.me.id === post.creator.id;
             return !post ? null : (
               <Flex
                 key={post.id}
@@ -74,12 +80,12 @@ const Index = () => {
                 </Flex>
                 <Flex ml="auto" direction="column" justifyContent="center">
                   <EditPostButton
-                    show={showButtons}
+                    show={!!showButtons}
                     id={post.id}
                   ></EditPostButton>
                   <br />
                   <DeletePostButton
-                    show={showButtons}
+                    show={!!showButtons}
                     id={post.id}
                   ></DeletePostButton>
                 </Flex>
@@ -92,9 +98,11 @@ const Index = () => {
         <Flex>
           <Button
             onClick={() => {
-              setVariables({
-                limit: variables.limit,
-                cursor: posts[posts.length - 1].createdAt,
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  cursor: posts[posts.length - 1].createdAt,
+                },
               });
             }}
             isLoading={loading}

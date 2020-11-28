@@ -5,6 +5,7 @@ import Wrapper from "../components/Wrapper";
 import InputField from "../components/InputField";
 import { useForgotPasswordMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
+import { withApollo } from "../utils/withApollo";
 
 const ForgotPassword: React.FC<{}> = () => {
   const router = useRouter();
@@ -49,4 +50,4 @@ const ForgotPassword: React.FC<{}> = () => {
   );
 };
 
-export default ForgotPassword;
+export default withApollo({ ssr: false })(ForgotPassword);

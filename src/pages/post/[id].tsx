@@ -6,13 +6,14 @@ import { useMeQuery } from "../../generated/graphql";
 import { getIntIdFromUrl } from "../../utils/useGetIntIdFromUrl";
 import { getPostFromUrlById } from "../../utils/useGetPostFromUrlById";
 import DeletePostButton from "../../components/DeletePostButton";
+import { withApollo } from "../../utils/withApollo";
 
 const Post = () => {
   const intId = getIntIdFromUrl();
   const { data, loading } = getPostFromUrlById(intId);
-  const { data: meData, loading: fetchingMeData } = useMeQuery();
+  const { data: meData, loading: loadingingMeData } = useMeQuery();
 
-  if (loading || fetchingMeData) {
+  if (loading || loadingingMeData) {
     return <Layout>Loading...</Layout>;
   }
 
@@ -45,4 +46,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default withApollo({ ssr: true })(Post);

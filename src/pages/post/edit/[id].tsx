@@ -8,6 +8,7 @@ import { useIsAuth } from "../../../utils/useIsAuth";
 import { getPostFromUrlById } from "../../../utils/useGetPostFromUrlById";
 import { getIntIdFromUrl } from "../../../utils/useGetIntIdFromUrl";
 import { useRouter } from "next/router";
+import { withApollo } from "../../../utils/withApollo";
 
 const EditPost: React.FC<{}> = ({}) => {
   const intId = getIntIdFromUrl();
@@ -30,7 +31,7 @@ const EditPost: React.FC<{}> = ({}) => {
         }}
         onSubmit={async (values, { setErrors }) => {
           // console.log(data?.post?.text);
-          const { error } = await updatePost({
+          const { error: errors } = await updatePost({
             variables: {
               id: intId,
               title: values.title,
@@ -38,7 +39,7 @@ const EditPost: React.FC<{}> = ({}) => {
             },
           });
 
-          if (error) {
+          if (errors) {
           } else {
             router.push("/");
           }
@@ -83,4 +84,4 @@ const EditPost: React.FC<{}> = ({}) => {
   );
 };
 
-export default EditPost;
+export default withApollo({ ssr: false })(EditPost);
