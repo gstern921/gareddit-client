@@ -13,7 +13,10 @@ import {
   LogoutMutation,
 } from "../generated/graphql";
 import { betterUpdateQuery } from "./betterUpdateQuery";
-import { VoteMutationVariables } from "../generated/graphql";
+import {
+  VoteMutationVariables,
+  DeletePostMutationVariables,
+} from "../generated/graphql";
 import isServer from "./isServer";
 
 const errorExchange: Exchange = ({ forward }) => (ops$) => {
@@ -81,7 +84,7 @@ const cursorPagination = (): Resolver => {
 const createUrqlClient = (ssrExchange: any, ctx: any) => {
   let cookie = "";
   if (isServer()) {
-    cookie = ctx.req.headers.cookie;
+    cookie = ctx?.req.headers.cookie;
   }
   return {
     url: config.GRAPHQL_URL,
@@ -107,6 +110,12 @@ const createUrqlClient = (ssrExchange: any, ctx: any) => {
         },
         updates: {
           Mutation: {
+            deletePost: (result, args, cache, info) => {
+              cache.invalidate({
+                __typename: "Post",
+                id: (args as DeletePostMutationVariables).id,
+              });
+            },
             vote: (result, args, cache, info) => {
               const { postId, value } = args as VoteMutationVariables;
               const data = cache.readFragment(

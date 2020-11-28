@@ -1,22 +1,21 @@
+import { Box, Heading } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import React from "react";
-import createUrqlClient from "../../utils/createUrqlClient";
-import { useRouter } from "next/router";
-import { usePostQuery } from "../../generated/graphql";
+import EditPostButton from "../../components/EditPostButton";
 import Layout from "../../components/Layout";
-import { Heading, Box, Link, Flex } from "@chakra-ui/react";
-import NextLink from "next/link";
+import { useMeQuery } from "../../generated/graphql";
+import createUrqlClient from "../../utils/createUrqlClient";
+import { getIntIdFromUrl } from "../../utils/useGetIntIdFromUrl";
+import { getPostFromUrlById } from "../../utils/useGetPostFromUrlById";
+import { isPostEditableByUser } from "../../utils/IsPostEditableByUser";
+import DeletePostButton from "../../components/DeletePostButton";
 
 const Post = () => {
-  const router = useRouter();
-  const intId =
-    typeof router.query.id === "string" ? parseInt(router.query.id) : -1;
-  const [{ data, fetching }] = usePostQuery({
-    pause: intId === -1,
-    variables: { id: intId },
-  });
+  const intId = getIntIdFromUrl();
+  const [{ data, fetching }] = getPostFromUrlById(intId);
+  const [{ data: meData, fetching: fetchingMeData }] = useMeQuery();
 
-  if (fetching) {
+  if (fetching || fetchingMeData) {
     return <Layout>Loading...</Layout>;
   }
 
@@ -28,10 +27,23 @@ const Post = () => {
     );
   }
 
+  const showEditAndDeleteButtons =
+    meData != undefined &&
+    meData.me != undefined &&
+    meData.me.id === data.post.creator.id;
+
   return (
     <Layout>
       <Heading mb={4}>{data.post.title}</Heading>
-      {data.post.text}
+      <Box mb={4}>{data.post.text}</Box>
+      <EditPostButton
+        show={showEditAndDeleteButtons}
+        id={data.post.id}
+      ></EditPostButton>
+      <DeletePostButton
+        show={showEditAndDeleteButtons}
+        id={data.post.id}
+      ></DeletePostButton>
     </Layout>
   );
 };

@@ -1,9 +1,13 @@
 import { withUrqlClient } from "next-urql";
 import createUrqlClient from "../utils/createUrqlClient";
-import { usePostsQuery, useDeletePostMutation } from "../generated/graphql";
+import {
+  usePostsQuery,
+  useDeletePostMutation,
+  useMeQuery,
+} from "../generated/graphql";
 import Layout from "../components/Layout";
 import NextLink from "next/link";
-import { ChevronUpIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Link,
   Stack,
@@ -14,8 +18,10 @@ import {
   Button,
   IconButton,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { UpdootSection } from "../components/UpdootSection";
+import EditPostButton from "../components/EditPostButton";
+import DeletePostButton from "../components/DeletePostButton";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -23,7 +29,7 @@ const Index = () => {
     cursor: null as null | string,
   });
   const [{ data, fetching }] = usePostsQuery({ variables });
-  const [, deletePost] = useDeletePostMutation();
+  const [{ data: meData }] = useMeQuery();
 
   const posts = data ? data.posts.posts : [];
 
@@ -37,37 +43,57 @@ const Index = () => {
         )
       ) : (
         <Stack mt={2} spacing={0}>
-          {posts.map((post) => (
-            <Flex key={post.id} p={5} my={4} shadow="md" borderWidth="1px">
-              <UpdootSection post={post}></UpdootSection>
-              <Flex alignItems="center" flex={1}>
-                <Flex direction="column">
-                  <NextLink href={`/post/[id]`} as={`/post/${post.id}`}>
-                    <Link>
-                      <Heading fontSize="xl">{post.title}</Heading>
-                    </Link>
-                  </NextLink>
-                  <Text fontSize=".8rem" color="#444">
-                    posted by {post.creator.username}
-                  </Text>
-                  <Text mt={4}>{post.textSnippet}</Text>
+          {posts.map((post) => {
+            const showButtons =
+              meData?.me.id && meData.me.id === post.creator.id;
+            return !post ? null : (
+              <Flex
+                key={post.id}
+                p={5}
+                minHeight="200px"
+                maxHeight="300px"
+                my={4}
+                shadow="md"
+                borderWidth="1px"
+                overflowY="hidden"
+              >
+                <UpdootSection post={post}></UpdootSection>
+                <Flex
+                  alignItems="center"
+                  flex={1}
+                  alignContent="stretch"
+                  wordBreak="break-word"
+                  mr={2}
+                >
+                  <Box>
+                    <NextLink href={`/post/[id]`} as={`/post/${post.id}`}>
+                      <Link>
+                        <Heading display="inline-block" fontSize="xl">
+                          {post.title}
+                        </Heading>
+                      </Link>
+                    </NextLink>
+                    <br />
+                    <Text display="inline-block" fontSize=".8rem" color="#444">
+                      posted by {post.creator.username}
+                    </Text>
+                    <Text mt={4}>{post.textSnippet}</Text>
+                  </Box>
                 </Flex>
-                <Flex ml="auto">
-                  <IconButton
-                    onClick={async () => {
-                      await deletePost({ id: post.id });
-                    }}
-                    right={0}
-                    variant=""
-                    fontSize="20px"
-                    ml="auto"
-                    aria-label="Delete Post"
-                    icon={<DeleteIcon></DeleteIcon>}
-                  ></IconButton>
+                <Flex ml="auto" direction="column" justifyContent="center">
+                  <EditPostButton
+                    show={showButtons}
+                    id={post.id}
+                  ></EditPostButton>
+                  <br />
+                  <DeletePostButton
+                    show={showButtons}
+                    id={post.id}
+                  ></DeletePostButton>
                 </Flex>
               </Flex>
-            </Flex>
-          ))}
+            );
+          })}
         </Stack>
       )}
       {data && data.posts.hasMore ? (
