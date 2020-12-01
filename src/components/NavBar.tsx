@@ -3,7 +3,6 @@ import React from "react";
 import NextLink from "next/link";
 import { useMeQuery, useLogoutMutation } from "../generated/graphql";
 import isServer from "../utils/isServer";
-import { useRouter } from "next/router";
 import { useApolloClient } from "@apollo/client";
 
 interface NavBarProps {}
@@ -11,7 +10,6 @@ interface NavBarProps {}
 const NavBar: React.FC<NavBarProps> = ({}) => {
   const [logout, { loading: logoutLoading }] = useLogoutMutation();
   const { data, loading } = useMeQuery({ skip: isServer() });
-  const router = useRouter();
   const apolloClient = useApolloClient();
   let body = null;
   if (loading) {
@@ -21,10 +19,12 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
     body = (
       <>
         <NextLink href="/login">
-          <Link mr={2}>Log In</Link>
+          <Link color="white" mr={4}>
+            Log In
+          </Link>
         </NextLink>
         <NextLink href="/register">
-          <Link>Register</Link>
+          <Link color="white">Register</Link>
         </NextLink>
       </>
     );
@@ -55,11 +55,11 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
     // user is logged in
   }
   return (
-    <Flex zIndex={1} position="sticky" top={0} bg="tan" p={4}>
+    <Flex zIndex={1} position="sticky" top={0} bg="#0af" p={4}>
       <Flex flex={1} m="auto" align="center" maxW={800}>
         <NextLink href="/">
           <Link>
-            <Heading>Gareddit</Heading>
+            <Heading color="white">Gareddit</Heading>
           </Link>
         </NextLink>
         <Box ml="auto">{body}</Box>

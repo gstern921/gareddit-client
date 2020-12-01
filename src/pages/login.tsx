@@ -19,6 +19,7 @@ const Login: React.FC<LoginProps> = () => {
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
+          console.log(values);
           const res = await login({
             variables: values,
             update: (cache, { data }) => {
@@ -34,6 +35,7 @@ const Login: React.FC<LoginProps> = () => {
           });
           const user = res.data?.login.user;
           if (res.data?.login.errors) {
+            console.log(res.data.login.errors);
             setErrors(toErrorMap(res.data.login.errors));
           } else if (user) {
             const redirectedFrom =
@@ -62,14 +64,17 @@ const Login: React.FC<LoginProps> = () => {
             </Box>
             <Flex>
               <NextLink href="/forgot-password">
-                <Link ml="auto">Forgot password?</Link>
+                <Link mt={1} ml="auto">
+                  Forgot password?
+                </Link>
               </NextLink>
             </Flex>
             <Box mt={4}>
               <Button
                 mt={-4}
                 type="submit"
-                colorScheme="teal"
+                backgroundColor="#0af"
+                color="#fff"
                 isLoading={isSubmitting}
               >
                 Log in
