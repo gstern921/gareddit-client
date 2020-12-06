@@ -65,7 +65,7 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
             return;
           }
           setUpdootLoading(true);
-          const successful = await vote({
+          await vote({
             variables: { value: 1, postId: post.id },
             update: (cache) => {
               updateAfterVote(1, post.id, cache);
@@ -86,7 +86,7 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
             return;
           }
           setDowndootLoading(true);
-          const successful = await vote({
+          await vote({
             variables: { value: -1, postId: post.id },
             update: (cache) => {
               updateAfterVote(-1, post.id, cache);

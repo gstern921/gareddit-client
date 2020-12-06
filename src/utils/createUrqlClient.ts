@@ -119,13 +119,13 @@ const createUrqlClient = (ssrExchange: any, ctx: any) => {
         },
         updates: {
           Mutation: {
-            deletePost: (result, args, cache, info) => {
+            deletePost: (_result, args, cache, _info) => {
               cache.invalidate({
                 __typename: "Post",
                 id: (args as DeletePostMutationVariables).id,
               });
             },
-            vote: (result, args, cache, info) => {
+            vote: (_result, args, cache, _info) => {
               const { postId, value } = args as VoteMutationVariables;
               const data = cache.readFragment(
                 gql`
@@ -157,7 +157,7 @@ const createUrqlClient = (ssrExchange: any, ctx: any) => {
                 );
               }
             },
-            login: (result, args, cache, info) => {
+            login: (result, _args, cache, _info) => {
               betterUpdateQuery<LoginMutation, MeQuery>(
                 cache,
                 { query: MeDocument },
@@ -174,7 +174,7 @@ const createUrqlClient = (ssrExchange: any, ctx: any) => {
               );
               invalidateAllPosts(cache);
             },
-            register: (result, args, cache, info) => {
+            register: (result, _args, cache, _info) => {
               betterUpdateQuery<RegisterMutation, MeQuery>(
                 cache,
                 { query: MeDocument },
@@ -190,10 +190,10 @@ const createUrqlClient = (ssrExchange: any, ctx: any) => {
                 }
               );
             },
-            createPost: (result, args, cache, info) => {
+            createPost: (_result, _args, cache, _info) => {
               invalidateAllPosts(cache);
             },
-            logout: (result, args, cache, info) => {
+            logout: (result, _args, cache, _info) => {
               betterUpdateQuery<LogoutMutation, MeQuery>(
                 cache,
                 { query: MeDocument },

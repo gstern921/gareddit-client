@@ -31,7 +31,7 @@ const EditPost: React.FC<{}> = ({}) => {
         }}
         onSubmit={async (values, { setErrors }) => {
           // console.log(data?.post?.text);
-          const { error: errors } = await updatePost({
+          const { errors } = await updatePost({
             variables: {
               id: intId,
               title: values.title,

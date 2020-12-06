@@ -1,4 +1,4 @@
-import { usePostsQuery, useMeQuery, PostsQuery } from "../generated/graphql";
+import { usePostsQuery, useMeQuery } from "../generated/graphql";
 import Layout from "../components/Layout";
 import NextLink from "next/link";
 import {
@@ -10,7 +10,7 @@ import {
   Flex,
   Button,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 import { UpdootSection } from "../components/UpdootSection";
 import EditPostButton from "../components/EditPostButton";
 import DeletePostButton from "../components/DeletePostButton";
