@@ -29,7 +29,7 @@ const EditPost: React.FC<{}> = ({}) => {
           title: data?.post?.title || "",
           text: data?.post?.text || "",
         }}
-        onSubmit={async (values, { setErrors }) => {
+        onSubmit={async (values) => {
           // console.log(data?.post?.text);
           const { errors } = await updatePost({
             variables: {
